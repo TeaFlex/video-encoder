@@ -26,11 +26,13 @@ Write-Host "Encoding $InputPath to $OutputPath..."
 # FFmpeg command using NVIDIA NVENC
 $ffmpegCommand = @(
     "ffmpeg",
-    "-i", "`"$InputPath`"",
-    "-c:v", "h264_nvenc",
-    "-preset", "slow",
-    "-profile:v", "high",
-    "-rc", "vbr",
+    "-hwaccel", "cuda", 
+    "-hwaccel_output_format", "cuda",
+    "-i", $InputPath,
+    "-c:v", "hevc_nvenc",
+    "-preset", "p6", 
+    "-profile:v", "main10",  
+    "-rc", "constqp",
     "-cq", "22",
     "-b:v", "0",
     "-map", "0:v",
@@ -39,7 +41,7 @@ $ffmpegCommand = @(
     "-c:a", "aac",
     "-b:a", "192k",
     "-c:s", "copy",
-    "`"$OutputPath`""
+    $OutputPath
 )
 
 # Join the command array into a string
