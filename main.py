@@ -2,8 +2,10 @@ import subprocess
 import os
 import argparse
 import logging
-import time
 import shutil
+
+from datetime import datetime, UTC
+from time import sleep
 from pathlib import Path
 
 # Configure logging to output to stdout
@@ -27,7 +29,8 @@ def encode_video(input_path: str, output_dir: str) -> None:
     """
     # Get the filename without extension and add timestamp
     input_name = os.path.splitext(os.path.basename(input_path))[0]
-    timestamp = int(time.time())
+    now = datetime.now(tz=UTC)
+    timestamp = int(now.timestamp())
     output_filename = f"{input_name}_{timestamp}.mkv"
     output_path = os.path.join(output_dir, output_filename)
 
@@ -125,7 +128,7 @@ def monitor_and_transcode(input_dir: Path, transcoding_dir: Path, transcoded_dir
                 logger.error(f"Moved {filename} back to {input_dir}.")
 
         # Wait a bit before checking again
-        time.sleep(5)
+        sleep(5)
 
 if __name__ == "__main__":
     # Configure argument parser
