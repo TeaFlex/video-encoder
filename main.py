@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 VIDEO_EXTENTIONS = {".mp4", ".mkv", ".avi", ".mov", ".flv", ".wmv"}
+SLEEP_TIME_SECONDS = 5 # in seconds
 
 def encode_video(input_path: str, output_dir: str) -> None:
     """
@@ -92,12 +93,19 @@ def monitor_and_transcode(input_dir: Path, transcoding_dir: Path, transcoded_dir
 
     logger.info(f"Monitoring directory: {input_dir}")
 
+    some_files_previously_detected = True
+
     while True:
         # Check for files in the input directory
         files = (f for f in input_dir.iterdir() if f.is_file())
 
-        logger.info("Reading directory for content...")
+        first_file = next(input_dir.iterdir(), None)
+        some_files_detected = first_file is not None
 
+        if not some_files_detected and some_files_previously_detected:
+            logger.info("No content found, waiting...")
+
+        some_files_previously_detected = some_files_detected
         # Process each file in the input directory
         for file_path in files:
 
@@ -128,7 +136,7 @@ def monitor_and_transcode(input_dir: Path, transcoding_dir: Path, transcoded_dir
                 logger.error(f"Moved {filename} back to {input_dir}.")
 
         # Wait a bit before checking again
-        sleep(5)
+        sleep(SLEEP_TIME_SECONDS)
 
 if __name__ == "__main__":
     # Configure argument parser
